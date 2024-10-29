@@ -6,6 +6,9 @@ import { AvatarType, getAvatarType } from "./utils/avatar";
 import {
   BODY_PART_BOUNDING_BOX_INDICES,
   BoundingBoxMeasurementIndices,
+  FIRST_INDEX_IN_PHOTO_AVATAR_POSITION_ARRAY_TO_DRAW_POSTURE_LINES,
+  FIRST_INDEX_IN_STATS_AVATAR_POSITION_ARRAY_TO_DRAW_POSTURE_LINES,
+  PostureLineNames,
 } from "./utils/constants";
 
 export type R3FAvatarState = {
@@ -21,6 +24,7 @@ export type R3FAvatarState = {
   isOrbitControlsEnabled: boolean | undefined;
   cameraDirection: CameraDirection | undefined;
   ringCoords: BoundingBoxMeasurementIndices[];
+  firstIndexToDrawPostureLines: Record<PostureLineNames, number>;
 };
 
 export type R3FAvatarActions = {
@@ -53,6 +57,10 @@ export function createR3FAvatarStore(config: R3FAvatarConfig) {
   const ringCoords = BODY_PART_BOUNDING_BOX_INDICES.filter(
     (part) => part.avatarType === avatarType
   );
+  const firstIndexToDrawPostureLines =
+    avatarType === "photo"
+      ? FIRST_INDEX_IN_PHOTO_AVATAR_POSITION_ARRAY_TO_DRAW_POSTURE_LINES
+      : FIRST_INDEX_IN_STATS_AVATAR_POSITION_ARRAY_TO_DRAW_POSTURE_LINES;
 
   return create<R3FAvatarState & R3FAvatarActions>((set) => ({
     __internal: {
@@ -65,6 +73,7 @@ export function createR3FAvatarStore(config: R3FAvatarConfig) {
     cameraDirection: undefined,
     isOrbitControlsEnabled: undefined,
     ringCoords,
+    firstIndexToDrawPostureLines,
     onControllerReady: (controller: OrbitControlsInstance) => {
       if (setController) {
         setController(controller);
@@ -75,7 +84,16 @@ export function createR3FAvatarStore(config: R3FAvatarConfig) {
       const _ringCoords = BODY_PART_BOUNDING_BOX_INDICES.filter(
         (part) => part.avatarType === _avatarType
       );
-      set({ avatar, avatarType: _avatarType, ringCoords: _ringCoords });
+      const _firstIndexToDrawPostureLines =
+        _avatarType === "photo"
+          ? FIRST_INDEX_IN_PHOTO_AVATAR_POSITION_ARRAY_TO_DRAW_POSTURE_LINES
+          : FIRST_INDEX_IN_STATS_AVATAR_POSITION_ARRAY_TO_DRAW_POSTURE_LINES;
+      set({
+        avatar,
+        avatarType: _avatarType,
+        ringCoords: _ringCoords,
+        firstIndexToDrawPostureLines: _firstIndexToDrawPostureLines,
+      });
     },
     __updateInternalStore: (state: Partial<R3FAvatarState["__internal"]>) => {
       set((prev) => ({ __internal: { ...prev.__internal, ...state } }));

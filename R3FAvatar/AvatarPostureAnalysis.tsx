@@ -1,7 +1,5 @@
 import { ErrorBoundary } from "react-error-boundary";
 import { AvatarHorizontalPostureLines } from "./AvatarPostureHorizontalLines";
-import { FIRST_INDEX_IN_AVATAR_POSITION_ARRAY } from "./utils/constants";
-import { useMemo } from "react";
 import { AvatarVerticalPostureLines } from "./AvatarPostureVerticalLines";
 import { R3FAvatar } from ".";
 
@@ -61,42 +59,8 @@ export type AvatarPostureAnalysisProps = {
   };
 };
 
-const { MID_POINT_OF_EYES, MID_POINT_OF_SHOULDERS, MID_POINT_OF_PELVIS } =
-  FIRST_INDEX_IN_AVATAR_POSITION_ARRAY;
-
 export function AvatarPostureAnalysis(props: AvatarPostureAnalysisProps) {
   const { avatar, front, side } = props;
-
-  const lineData = useMemo(() => {
-    if (!front) return [];
-    const { ear, shoulder, topHip } = front;
-
-    const data: { angle: number; firstIndexInAvatarPositionArray: number }[] =
-      [];
-
-    if (ear && typeof ear.angle === "number") {
-      data.push({
-        angle: ear.angle,
-        firstIndexInAvatarPositionArray: MID_POINT_OF_EYES,
-      });
-    }
-
-    if (shoulder && typeof shoulder.angle === "number") {
-      data.push({
-        angle: shoulder.angle,
-        firstIndexInAvatarPositionArray: MID_POINT_OF_SHOULDERS,
-      });
-    }
-
-    if (topHip && typeof topHip.angle === "number") {
-      data.push({
-        angle: topHip.angle,
-        firstIndexInAvatarPositionArray: MID_POINT_OF_PELVIS,
-      });
-    }
-
-    return data;
-  }, [front]);
 
   return (
     <ErrorBoundary FallbackComponent={() => <></>}>
@@ -106,7 +70,7 @@ export function AvatarPostureAnalysis(props: AvatarPostureAnalysisProps) {
           isOrbitControlsEnabled={false}
           cameraDirection="front"
         >
-          <AvatarHorizontalPostureLines lineData={lineData} />
+          <AvatarHorizontalPostureLines front={front} />
         </R3FAvatar>
       </div>
       <div style={{ height: 600, width: 600 }}>
